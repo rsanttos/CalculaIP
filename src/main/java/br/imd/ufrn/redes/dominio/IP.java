@@ -1,11 +1,16 @@
 package br.imd.ufrn.redes.dominio;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class IP {
 	private String enderecoIP;
 	private String mascaraPadrao;
 	private String netID;
 	private String hostID;
 	private char classe;
+	private List<String> blocosInteiros;
+	private List<String> blocosBinarios;
 	
 	public IP(){
 		this.enderecoIP = new String();
@@ -13,6 +18,18 @@ public class IP {
 		this.netID = new String();
 		this.hostID = new String();
 		this.classe = '0';
+		this.blocosInteiros = new ArrayList<String>();
+		this.blocosBinarios = new ArrayList<String>();
+	}
+	
+	public IP(String enderecoIP){
+		this.enderecoIP = new String(enderecoIP);
+		this.mascaraPadrao = new String();
+		this.netID = new String();
+		this.hostID = new String();
+		this.classe = '0';
+		this.blocosInteiros = new ArrayList<String>();
+		this.blocosBinarios = new ArrayList<String>();
 	}
 
 	public String getEnderecoIP() {
@@ -54,5 +71,21 @@ public class IP {
 	public void setClasse(char classe) {
 		this.classe = classe;
 	}
+
+	public List<String> getBlocosInteiros() {
+		return blocosInteiros;
+	}
+
+	public void setBlocosInteiros(List<String> blocos) {
+		this.blocosInteiros = blocos;
+	}
+
+	public List<String> getBlocosBinarios() {
+		return blocosBinarios;
+	}
+
+	public void setBlocosBinarios(List<String> blocosBinarios) {
+		this.blocosBinarios = blocosBinarios;
+	}	
 	
 }
