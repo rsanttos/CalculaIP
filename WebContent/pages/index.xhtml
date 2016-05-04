@@ -1,0 +1,52 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/include/template.xhtml">
+
+   <ui:define name="conteudo">
+   		<h:form>
+	      <div class="inv-dashboard-maior">
+              <p class="inv-dashboard-titulo">Lembretes</p>
+              
+              <!-- botao de criacao para exemplo ====================== -->
+              
+				
+				<div class="col-xs-12 inv-button">
+				</div>
+				
+            </div>
+
+            <div class="inv-dashboard-menor">
+              <p class="inv-dashboard-titulo">Mensagens</p>
+            </div>
+
+            <div class="inv-dashboard-menor">
+              <p class="inv-dashboard-titulo">Questionários recentes</p>
+            </div>
+            
+            <div class="inv-dashboard-maior">
+              <p class="inv-dashboard-titulo">Validações</p>
+              
+              <!-- botao de criacao para exemplo ====================== -->
+              
+				
+				<div class="col-xs-12 inv-button">
+					      <p:editor />
+					<h:commandButton class="inv-submit" action="#{tipoAssessoriaMBean.novo}" value="Novo Tipo" />
+					<h:commandButton class="inv-submit" action="#{tipoEventoMBean.novo}" value="Novo Tipo Evento" />
+					<h:commandButton class="inv-submit" action="#{tipoMensagemMBean.novo}" value="Novo Tipo Mensagem" />
+					<h:commandButton class="inv-submit" action="#{tipoArquivoMBean.novo}" value="Novo Tipo Arquivo" />
+					<h:commandButton class="inv-submit" action="#{tipoPerguntaMBean.novo}" value="Novo Tipo Pergunta" />
+					<h:commandButton class="inv-submit" action="#{tipoDesligamentoMBean.novo}" value="Novo Tipo Desligamento" />
+
+				</div>
+				
+            </div>
+            
+    	</h:form>
+    </ui:define>
+  
+
+</ui:composition>
