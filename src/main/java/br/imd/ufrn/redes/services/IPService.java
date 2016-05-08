@@ -8,11 +8,9 @@ import br.imd.ufrn.redes.dominio.IP;
 public class IPService {
 
 	private IP ip;
-	private static ManipulaBinarioService manipulaBinarioService;
 
 	public IPService() {
 		this.ip = new IP();
-		manipulaBinarioService = new ManipulaBinarioService();
 	}
 
 	public IP getIp() {
@@ -292,25 +290,6 @@ public class IPService {
 		case 'E':
 			ip.setHostID("Não se aplica");
 			break;
-		}
-	}
-
-	public static void defineNetIDDinamico(IP ip, IP mascara) {
-		separaBlocos(ip);
-		separaBlocos(mascara);
-		int tamanho = ip.getBlocosBinarios().size();
-		int bin1;
-		int bin2;
-		int soma;
-		List<String> listaAux = new ArrayList<String>();
-		for (int i = 0; i < tamanho; i++) {
-			bin1 = Integer.parseInt(ip.getBlocosBinarios().get(i));
-			bin2 = Integer.parseInt(mascara.getBlocosBinarios().get(i));
-			soma = bin1 + bin2;
-			listaAux.add(Integer.toBinaryString(soma));
-			System.out.println(bin1);
-			System.out.println(bin2);
-			System.out.println(listaAux.get(i));
 		}
 	}
 
