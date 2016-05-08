@@ -34,7 +34,7 @@ public class ManipulaBinarioService {
 		return strAux;
 	}
 	
-	public int converteBinarioDecimal(String binario){
+	public static int converteBinarioDecimal(String binario){
 		int decimal = Integer.parseInt(binario, 2);
 		return decimal;
 	}

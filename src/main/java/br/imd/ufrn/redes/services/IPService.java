@@ -24,23 +24,35 @@ public class IPService {
 	}
 
 	public static void main(String args[]) {
-		IP ip = new IP("122.2.255.234");
+		IP ip = new IP("10.168.255.234");
 		IP mascara = new IP("255.0.0.0");
 		separaBlocos(ip);
-		imprimeBlocosInteirosEBinarios(ip);
+		// imprimeBlocosInteirosEBinarios(ip);
 		defineClasseIP(ip);
 		System.out.println(ip.getClasse());
-		defineMascaraPadraoIP(ip);
-		System.out.println(ip.getMascaraPadrao());
-		defineNetIDSimples(ip);
-		defineHostIDSimples(ip);
-		System.out.println(ip.getNetID());
-		System.out.println(ip.getHostID());
-//		boolean testePonto = validarSeparacaoPorPontoIP(ip);
-//		System.out.println(testePonto);
-//		boolean testeIntervalo = validarIntervaloBloco(ip);
-//		System.out.println(testeIntervalo);
-		defineNetIDDinamico(ip, mascara);
+		// defineMascaraPadraoIP(ip);
+		// System.out.println(ip.getMascaraPadrao());
+		// defineNetIDSimples(ip);
+		// defineHostIDSimples(ip);
+		// System.out.println(ip.getNetID());
+		// System.out.println(ip.getHostID());
+		// boolean testePonto = validarSeparacaoPorPontoIP(ip);
+		// System.out.println(testePonto);
+		// boolean testeIntervalo = validarIntervaloBloco(ip);
+		// System.out.println(testeIntervalo);
+		// defineNetIDDinamico(ip, mascara);
+		// calculaAND(ip, mascara);
+//		defineEnderecoIPBinarioSemPonto(ip);
+//		System.out.println(ip.getEnderecoIPBinario());
+//		System.out.println(ip.getNetIDBinario());
+//		System.out.println(ip.getHostIDBinario());
+//		calculaNetID(ip, 10);
+//		System.out.println(ip.getNetID());
+//		System.out.println(ip.getNetIDBinario());
+//		calculaHostID(ip, 30);
+//		System.out.println(ip.getHostID());
+//		System.out.println(ip.getHostIDBinario());
+		System.out.println(verificaEnderecoPrivado(ip));
 	}
 
 	public static boolean validarSeparacaoPorPontoIP(IP ip) {
@@ -72,18 +84,90 @@ public class IPService {
 			return false;
 		}
 	}
-	
-	public static boolean validarIntervaloBloco(IP ip){
+
+	public static boolean validarIntervaloBloco(IP ip) {
 		separaBlocos(ip);
 		int tamanho = ip.getBlocosInteiros().size();
-		for (int i = 0 ; i < tamanho ; i++){
-			if(Integer.parseInt(ip.getBlocosInteiros().get(i)) < 0 || Integer.parseInt(ip.getBlocosInteiros().get(i)) > 255){
+		for (int i = 0; i < tamanho; i++) {
+			if (Integer.parseInt(ip.getBlocosInteiros().get(i)) < 0
+					|| Integer.parseInt(ip.getBlocosInteiros().get(i)) > 255) {
 				return false;
 			}
 		}
 		return true;
 	}
-	
+
+	public static void calculaNetID(IP ip, int n) {
+		String pedaco = new String();
+		String arrayZero = new String();
+		String aux = new String();
+		String auxDecimal = new String();
+		int fimPedaco = ip.getNetIDBinario().length();
+		int inicioPedaco = fimPedaco - n;
+		int limite;
+		int i = n;
+		List<String> arrayAux = new ArrayList<String>();
+
+		while (i > 0) {
+			arrayZero += '0';
+			i--;
+		}
+
+		pedaco = ip.getNetIDBinario().substring(inicioPedaco, fimPedaco);
+		ip.setNetIDBinario(ip.getNetIDBinario().replace(pedaco, arrayZero));
+
+		i = 1;		
+		while(i < 5){
+			limite = i*8;
+			for(int j = limite - 8 ; j < limite ; j++){
+				aux += ip.getNetIDBinario().charAt(j);				
+			}
+			int str = ManipulaBinarioService.converteBinarioDecimal(aux);
+			arrayAux.add(Integer.toString(str));
+			auxDecimal += Integer.toString(str);
+			auxDecimal += ".";
+			aux = new String();
+			i++;
+		}
+		ip.setNetID(auxDecimal);
+	}
+
+	public static void calculaHostID(IP ip, int n) {
+		String pedaco = new String();
+		String arrayUm = new String();	
+		String aux = new String();
+		String auxDecimal = new String();
+		int fimPedaco = ip.getHostIDBinario().length();
+		int inicioPedaco = fimPedaco - n;
+		int limite;
+		int i = n;
+		
+		List<String> arrayAux = new ArrayList<String>();
+
+		while (i > 0) {
+			arrayUm += '1';
+			i--;
+		}
+
+		pedaco = ip.getHostIDBinario().substring(inicioPedaco, fimPedaco);
+		ip.setHostIDBinario(ip.getHostIDBinario().replace(pedaco, arrayUm));
+		
+		i = 1;		
+		while(i < 5){
+			limite = i*8;
+			for(int j = limite - 8 ; j < limite ; j++){
+				aux += ip.getHostIDBinario().charAt(j);				
+			}
+			int str = ManipulaBinarioService.converteBinarioDecimal(aux);
+			arrayAux.add(Integer.toString(str));
+			auxDecimal += Integer.toString(str);
+			auxDecimal += ".";
+			aux = new String();
+			i++;
+		}
+		ip.setHostID(auxDecimal);
+	}
+
 	public static void separaBlocos(IP ip) {
 		String aux = new String();
 		int inteiroAux = 0;
@@ -148,6 +232,25 @@ public class IPService {
 		}
 	}
 
+	public static boolean verificaEnderecoPrivado(IP ip){
+		if(ip.getClasse() == 'A'){
+			if(ip.getBlocosInteiros().get(0) == "10"){
+				return true;
+			}
+		} else if (ip.getClasse() == 'B'){
+			if(ip.getBlocosInteiros().get(0) == "172" 
+					&& Integer.parseInt(ip.getBlocosInteiros().get(1)) >= 16 
+					&& Integer.parseInt(ip.getBlocosInteiros().get(1)) <= 31){
+				return true;
+			}
+		} else if (ip.getClasse() == 'C') {
+			if(ip.getBlocosInteiros().get(0) == "192" || ip.getBlocosInteiros().get(1) == "168"){
+				return true;
+			}
+		}
+		
+		return false;
+	}
 	public static void defineNetIDSimples(IP ip) {
 		char classe = ip.getClasse();
 		switch (classe) {
@@ -191,8 +294,8 @@ public class IPService {
 			break;
 		}
 	}
-	
-	public static void defineNetIDDinamico(IP ip, IP mascara){
+
+	public static void defineNetIDDinamico(IP ip, IP mascara) {
 		separaBlocos(ip);
 		separaBlocos(mascara);
 		int tamanho = ip.getBlocosBinarios().size();
@@ -200,7 +303,7 @@ public class IPService {
 		int bin2;
 		int soma;
 		List<String> listaAux = new ArrayList<String>();
-		for(int i = 0 ; i < tamanho ; i++){
+		for (int i = 0; i < tamanho; i++) {
 			bin1 = Integer.parseInt(ip.getBlocosBinarios().get(i));
 			bin2 = Integer.parseInt(mascara.getBlocosBinarios().get(i));
 			soma = bin1 + bin2;
@@ -210,7 +313,7 @@ public class IPService {
 			System.out.println(listaAux.get(i));
 		}
 	}
-	
+
 	public static void imprimeBlocosInteirosEBinarios(IP ip) {
 		for (int i = 0; i < ip.getBlocosInteiros().size(); i++) {
 			System.out.println("Posicao " + i + ":" + ip.getBlocosInteiros().get(i));
@@ -218,5 +321,40 @@ public class IPService {
 		for (int i = 0; i < ip.getBlocosBinarios().size(); i++) {
 			System.out.println("Posicao " + i + ":" + ip.getBlocosBinarios().get(i));
 		}
+	}
+
+	public static void defineEnderecoIPBinarioSemPonto(IP ip) {
+		String aux = new String();
+		String auxBin = new String();
+		int inteiroAux = 0;
+		int tamanho = ip.getEnderecoIP().length();
+		int j = 0;
+		while (j <= tamanho) {
+			if (j < tamanho) {
+				if (ip.getEnderecoIP().charAt(j) != '.') {
+					aux += ip.getEnderecoIP().charAt(j);
+				} else {
+					inteiroAux = Integer.parseInt(aux);
+					auxBin += ManipulaBinarioService.converteDecimalBinario(inteiroAux);
+					// auxBin+='.';
+					aux = new String();
+				}
+			} else {
+				inteiroAux = Integer.parseInt(aux);
+				auxBin += ManipulaBinarioService.converteDecimalBinario(inteiroAux);
+			}
+			j++;
+		}
+		ip.setEnderecoIPBinario(auxBin);
+		ip.setNetIDBinario(auxBin);
+		ip.setHostIDBinario(auxBin);
+	}
+
+	public static String colocaPontosEnderecoBinario(IP ip) {
+		String ipAux = new String();
+		for (int i = 0; i < ipAux.length(); i++) {
+
+		}
+		return ipAux;
 	}
 }
