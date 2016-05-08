@@ -22,12 +22,12 @@ public class IPService {
 	}
 
 	public static void main(String args[]) {
-		IP ip = new IP("10.168.255.234");
-		IP mascara = new IP("255.0.0.0");
+		IP ip = new IP("192.162.32.125");
+		IP mascara = new IP("255.255.240.0");
 		separaBlocos(ip);
 		// imprimeBlocosInteirosEBinarios(ip);
 		defineClasseIP(ip);
-		System.out.println(ip.getClasse());
+//		System.out.println(ip.getClasse());
 		// defineMascaraPadraoIP(ip);
 		// System.out.println(ip.getMascaraPadrao());
 		// defineNetIDSimples(ip);
@@ -40,17 +40,21 @@ public class IPService {
 		// System.out.println(testeIntervalo);
 		// defineNetIDDinamico(ip, mascara);
 		// calculaAND(ip, mascara);
-//		defineEnderecoIPBinarioSemPonto(ip);
+		//defineEnderecoIPBinarioSemPonto(ip);
+		//defineEnderecoIPBinarioSemPonto(mascara);
+		//defineNetIDDinamico(ip, mascara);
+		//defineHostIDDinamico(ip, mascara);
 //		System.out.println(ip.getEnderecoIPBinario());
 //		System.out.println(ip.getNetIDBinario());
 //		System.out.println(ip.getHostIDBinario());
-//		calculaNetID(ip, 10);
-//		System.out.println(ip.getNetID());
-//		System.out.println(ip.getNetIDBinario());
-//		calculaHostID(ip, 30);
-//		System.out.println(ip.getHostID());
-//		System.out.println(ip.getHostIDBinario());
+//		calculaNetID(ip, 12);
+		//System.out.println(ip.getNetID());
+		//System.out.println(ip.getNetIDBinario());
+		//calculaHostID(ip, 20);
+		//System.out.println(ip.getHostID());
+		//System.out.println(ip.getHostIDBinario());
 		System.out.println(verificaEnderecoPrivado(ip));
+		//System.out.println(calculaQtdUmDireita(mascara));
 	}
 
 	public static boolean validarSeparacaoPorPontoIP(IP ip) {
@@ -83,6 +87,20 @@ public class IPService {
 		}
 	}
 
+	public static void defineNetIDDinamico(IP ip, IP mascara){
+		int qtdUmDireita = calculaQtdUmDireita(mascara);
+		int n = 32 - qtdUmDireita;
+		
+		calculaNetID(ip, n);	
+	}
+	
+	public static void defineHostIDDinamico(IP ip, IP mascara){
+		int qtdUmDireita = calculaQtdUmDireita(mascara);
+		int n = 32 - qtdUmDireita;
+		
+		calculaHostID(ip, n);
+	}
+	
 	public static boolean validarIntervaloBloco(IP ip) {
 		separaBlocos(ip);
 		int tamanho = ip.getBlocosInteiros().size();
@@ -95,6 +113,21 @@ public class IPService {
 		return true;
 	}
 
+	public static int calculaQtdUmDireita(IP ip){
+		int i = 0;
+		int cont = 0;
+		int tamanho = ip.getEnderecoIPBinario().length();
+		while(i < tamanho){
+			if(ip.getEnderecoIPBinario().charAt(i) != '0'){
+				cont++;
+			} else {
+				return cont;
+			}
+			i++;
+		}
+		return cont;
+	}
+	
 	public static void calculaNetID(IP ip, int n) {
 		String pedaco = new String();
 		String arrayZero = new String();
@@ -198,54 +231,60 @@ public class IPService {
 		int primeiroByte = Integer.parseInt(ip.getBlocosInteiros().get(0));
 		if (primeiroByte >= 0 && primeiroByte <= 127) {
 			ip.setClasse('A');
+			ip.setMascaraPadrao("255.0.0.0");
 		} else if (primeiroByte >= 128 && primeiroByte <= 191) {
 			ip.setClasse('B');
+			ip.setMascaraPadrao("255.255.0.0");
 		} else if (primeiroByte >= 192 && primeiroByte <= 223) {
 			ip.setClasse('C');
+			ip.setMascaraPadrao("255.255.255.0");
 		} else if (primeiroByte >= 224 && primeiroByte <= 239) {
 			ip.setClasse('D');
+			ip.setMascaraPadrao("Não se aplica");
 		} else if (primeiroByte >= 240 && primeiroByte <= 255) {
 			ip.setClasse('E');
+			ip.setMascaraPadrao("Não se aplica");
 		}
 	}
 
-	public static void defineMascaraPadraoIP(IP ip) {
-		char classe = ip.getClasse();
-		switch (classe) {
-		case 'A':
-			ip.setMascaraPadrao("255.0.0.0");
-			break;
-		case 'B':
-			ip.setMascaraPadrao("255.255.0.0");
-			break;
-		case 'C':
-			ip.setMascaraPadrao("255.255.255.0");
-			break;
-		case 'D':
-			ip.setMascaraPadrao("Não se aplica");
-			break;
-		case 'E':
-			ip.setMascaraPadrao("Não se aplica");
-			break;
-		}
-	}
+//	public static void defineMascaraPadraoIP(IP ip) {
+//		char classe = ip.getClasse();
+//		switch (classe) {
+//		case 'A':
+//			ip.setMascaraPadrao("255.0.0.0");
+//			break;
+//		case 'B':
+//			ip.setMascaraPadrao("255.255.0.0");
+//			break;
+//		case 'C':
+//			ip.setMascaraPadrao("255.255.255.0");
+//			break;
+//		case 'D':
+//			ip.setMascaraPadrao("Não se aplica");
+//			break;
+//		case 'E':
+//			ip.setMascaraPadrao("Não se aplica");
+//			break;
+//		}
+//	}
 
 	public static boolean verificaEnderecoPrivado(IP ip){
 		if(ip.getClasse() == 'A'){
-			if(ip.getBlocosInteiros().get(0) == "10"){
+			if(ip.getBlocosInteiros().get(0).equals(new String("10"))){
 				return true;
 			}
 		} else if (ip.getClasse() == 'B'){
-			if(ip.getBlocosInteiros().get(0) == "172" 
+			if(ip.getBlocosInteiros().get(0).equals(new String("172")) 
 					&& Integer.parseInt(ip.getBlocosInteiros().get(1)) >= 16 
 					&& Integer.parseInt(ip.getBlocosInteiros().get(1)) <= 31){
 				return true;
 			}
 		} else if (ip.getClasse() == 'C') {
-			if(ip.getBlocosInteiros().get(0) == "192" || ip.getBlocosInteiros().get(1) == "168"){
+			if(ip.getBlocosInteiros().get(0).equals(new String("192")) || ip.getBlocosInteiros().get(1).equals(new String("168"))){
 				return true;
 			}
 		}
+		
 		
 		return false;
 	}
