@@ -2,10 +2,18 @@ package br.imd.ufrn.redes.dominio;
 
 import java.util.ArrayList;
 import java.util.List;
-
+/**
+ * Entidade que representa um endereço de IP e seus respectivos atributos
+ * @author ramonsantos
+ *
+ */
 public class IP {
 	private String enderecoIP;
 	private String enderecoIPBinario;
+	private String enderecoBroadcast;
+	private String enderecoBroadcastBinario;
+	private String enderecoSubRede;
+	private String enderecoSubRedeBinario;
 	private String mascaraPadrao;
 	private String netID;
 	private String netIDBinario;
@@ -15,6 +23,7 @@ public class IP {
 	private List<String> blocosInteiros;
 	private List<String> blocosBinarios;
 	private boolean privado;
+	private Long qtdEnderecos;
 	
 	public IP(){
 		this.enderecoIP = new String();
@@ -24,10 +33,15 @@ public class IP {
 		this.netIDBinario = new String();
 		this.hostID = new String();
 		this.hostIDBinario = new String();
+		this.enderecoBroadcast = new String();
+		this.enderecoBroadcastBinario = new String();
+		this.enderecoSubRede = new String();
+		this.enderecoSubRedeBinario = new String();
 		this.classe = '0';
 		this.blocosInteiros = new ArrayList<String>();
 		this.blocosBinarios = new ArrayList<String>();
 		this.privado = false;
+		this.qtdEnderecos = null;
 	}
 	
 	public IP(String enderecoIP){
@@ -38,10 +52,15 @@ public class IP {
 		this.netIDBinario = new String();
 		this.hostID = new String();
 		this.hostIDBinario = new String();
+		this.enderecoBroadcast = new String();
+		this.enderecoBroadcastBinario = new String();
+		this.enderecoSubRede = new String();
+		this.enderecoSubRedeBinario = new String();
 		this.classe = '0';
 		this.blocosInteiros = new ArrayList<String>();
 		this.blocosBinarios = new ArrayList<String>();
 		this.privado = false;
+		this.qtdEnderecos = null;
 	}
 
 	public String getEnderecoIP() {
@@ -130,5 +149,46 @@ public class IP {
 
 	public void setPrivado(boolean privado) {
 		this.privado = privado;
+	}
+
+	public Long getQtdEnderecos() {
+		return qtdEnderecos;
+	}
+
+	public void setQtdEnderecos(Long qtdEnderecos) {
+		this.qtdEnderecos = qtdEnderecos;
+	}
+
+	public String getEnderecoBroadcast() {
+		return enderecoBroadcast;
+	}
+
+	public void setEnderecoBroadcast(String enderecoBroadcast) {
+		this.enderecoBroadcast = enderecoBroadcast;
+	}
+
+	public String getEnderecoBroadcastBinario() {
+		return enderecoBroadcastBinario;
+	}
+
+	public void setEnderecoBroadcastBinario(String enderecoBroadcastBinario) {
+		this.enderecoBroadcastBinario = enderecoBroadcastBinario;
+	}
+
+	public String getEnderecoSubRede() {
+		return enderecoSubRede;
+	}
+
+	public void setEnderecoSubRede(String enderecoSubRede) {
+		this.enderecoSubRede = enderecoSubRede;
+	}
+
+	public String getEnderecoSubRedeBinario() {
+		return enderecoSubRedeBinario;
+	}
+
+	public void setEnderecoSubRedeBinario(String enderecoSubRedeBinario) {
+		this.enderecoSubRedeBinario = enderecoSubRedeBinario;
 	}	
+	
 }

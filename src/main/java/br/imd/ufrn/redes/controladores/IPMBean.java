@@ -5,7 +5,12 @@ import javax.faces.bean.SessionScoped;
 
 import br.imd.ufrn.redes.dominio.IP;
 import br.imd.ufrn.redes.services.IPService;
-
+/**
+ * Controladora responsável por realizar a ligação entre a interface de usuário e 
+ * a camada de serviço
+ * @author ramonsantos
+ *
+ */
 @ManagedBean
 @SessionScoped
 public class IPMBean {

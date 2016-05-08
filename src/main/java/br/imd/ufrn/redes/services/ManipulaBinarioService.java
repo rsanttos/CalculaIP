@@ -1,5 +1,9 @@
 package br.imd.ufrn.redes.services;
-
+/**
+ * Classe responsável por realizar manipulações com números binários
+ * @author ramonsantos
+ *
+ */
 public class ManipulaBinarioService {
 	private String binario;
 	
