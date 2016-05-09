@@ -43,7 +43,7 @@ public class IPService {
 	 * 
 	 * @param ip
 	 */
-	public IP tratarIPSimples(IP ip) {
+	public static IP tratarIPSimples(IP ip) {
 		IP ipAux = new IP();
 		ipAux = ip;
 		// Primeiro passo: Separar os blocos dos enderecos
@@ -66,9 +66,15 @@ public class IPService {
 				defineNetIDSimples(ipAux);
 				defineHostIDSimples(ipAux);
 			}
+			System.out.println("Classe do IP: " + ipAux.getClasse());
+			System.out.println("Privado: " + ipAux.isPrivado());
+			System.out.println("NetID: " + ipAux.getNetID());
+			System.out.println("HostID: " + ipAux.getHostID());
+			System.out.println("Máscara Padrão: " + ipAux.getMascaraPadrao());
 			return ipAux;
 		} else {
 			FacesMessage message = new FacesMessage("Por favor, digite um endereço válido");
+			System.out.println("O Endereço informado não é válido");
 			return null;
 		}
 	}
@@ -105,6 +111,11 @@ public class IPService {
 			defineEnderecoBroadcastDinamico(ipAux, mascara);
 			defineEnderecoSubRedeDinamico(ipAux, mascara);
 			ipAux.setQtdEnderecos(defineQtdEnderecos(ipAux, mascara));
+			System.out.println("Classe do IP: " + ipAux.getClasse());
+			System.out.println("Privado: " + ipAux.isPrivado());
+			System.out.println("Subrede: " + ipAux.getEnderecoSubRede());
+			System.out.println("Broadcast: " + ipAux.getEnderecoBroadcast());
+			System.out.println("Quantidade de endereços: " + ipAux.getQtdEnderecos());
 			return ipAux;
 		} else {
 			FacesMessage message = new FacesMessage("Por favor, digite um endereço válido");
@@ -787,8 +798,7 @@ public class IPService {
 					defineEnderecoBroadcastDinamico(newIPAux, mascara);
 					subRedes.add(newIPAux);
 				}
-				System.out.println(i);
-				imprimeBlocosInteirosEBinarios(subRedes.get(i));
+				System.out.println(subRedes.get(i).getEnderecoIP());
 			}
 			return subRedes;
 		} else if (n > 8 && n <= 16) {
@@ -837,9 +847,8 @@ public class IPService {
 						subRedes.add(newIPAux);
 					}
 				}
-				System.out.println(i);
 				if (intAux2 + 1 >= 0 && intAux2 + 1 <= 255) {
-					imprimeBlocosInteirosEBinarios(subRedes.get(i));
+					System.out.println(subRedes.get(i).getEnderecoIP());
 				}
 			}
 			return subRedes;
@@ -907,9 +916,8 @@ public class IPService {
 						subRedes.add(newIPAux);
 					}
 				}
-				System.out.println(i);
 				if (intAux3 + 1 >= 0 && intAux3 + 1 <= 255) {
-					imprimeBlocosInteirosEBinarios(subRedes.get(i));
+					System.out.println(subRedes.get(i).getEnderecoIP());
 				}
 			}
 			return subRedes;
