@@ -3,10 +3,14 @@ package br.imd.ufrn.redes.services;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.faces.application.FacesMessage;
+
 import br.imd.ufrn.redes.dominio.IP;
+
 /**
- * Classe de serviço responsável pela manipulação da classe IP e 
- * seus respectivos atributos
+ * Classe de serviço responsável pela manipulação da classe IP e seus
+ * respectivos atributos
+ * 
  * @author ramonsantos
  *
  */
@@ -29,44 +33,188 @@ public class IPService {
 	public static void main(String args[]) {
 		IP ip = new IP("192.168.0.0");
 		IP mascara = new IP("255.0.0.0");
-		separaBlocos(ip);
+		List<IP> lista = new ArrayList<IP>();
+		lista = tratarIPComMascaraESubRedes(ip, mascara);
+	}
+
+	/**
+	 * Método que recebe um IP e trata-o, retornando-o com as devidas
+	 * informações
+	 * 
+	 * @param ip
+	 */
+	public IP tratarIPSimples(IP ip) {
+		IP ipAux = new IP();
+		ipAux = ip;
+		// Primeiro passo: Separar os blocos dos enderecos
+		separaBlocos(ipAux);
+		// Segundo passo: validar se ip é válido
+		if (validaEnderecoIP(ipAux)) {
+			// Terceiro passo: Converter os endereços em binarios sem pontos
+			// e guardar uma única string
+			defineEnderecoIPBinarioSemPonto(ipAux);
+			// Quarto passo: Definir a classe do IP e a máscara padrão (se
+			// houver)
+			defineClasseIP(ipAux);
+			// Quinto passo: Verificar se o endereço IP é privado
+			if (verificaEnderecoPrivado(ipAux)) {
+				FacesMessage message = new FacesMessage("Atenção: O endereço é privado!");
+			}
+			// Sexto passo: definir netID e hostID a partir da classe do
+			// endereço
+			if (ipAux.getClasse() == 'A' || ipAux.getClasse() == 'B' || ipAux.getClasse() == 'C') {
+				defineNetIDSimples(ipAux);
+				defineHostIDSimples(ipAux);
+			}
+			return ipAux;
+		} else {
+			FacesMessage message = new FacesMessage("Por favor, digite um endereço válido");
+			return null;
+		}
+	}
+
+	/**
+	 * Método responsável por tratar um ip com máscara e retornar informações
+	 * como Endereço de Rede, Endereço de BroadCast e a Quantidade de Endereços
+	 * do bloco
+	 * 
+	 * @param ip
+	 * @return
+	 */
+	public static IP tratarIPComMascara(IP ip, IP mascara) {
+		IP ipAux = new IP();
+		ipAux = ip;
+		// Primeiro passo: Separar os blocos dos enderecos
+		separaBlocos(ipAux);
 		separaBlocos(mascara);
-		// imprimeBlocosInteirosEBinarios(ip);
-//		defineClasseIP(ip);
-		defineEnderecoIPBinarioSemPonto(ip);
-		defineEnderecoIPBinarioSemPonto(mascara);
-		// System.out.println(ip.getClasse());
-		// defineMascaraPadraoIP(ip);
-		// System.out.println(ip.getMascaraPadrao());
-		// defineNetIDSimples(ip);
-		// defineHostIDSimples(ip);
-		// System.out.println(ip.getNetID());
-		// System.out.println(ip.getHostID());
-		// boolean testePonto = validarSeparacaoPorPontoIP(ip);
-		// System.out.println(testePonto);
-		// boolean testeIntervalo = validarIntervaloBloco(ip);
-		// System.out.println(testeIntervalo);
-		defineNetIDDinamico(ip, mascara);
-		// defineNetIDDinamico(ip, mascara);
-		// defineHostIDDinamico(ip, mascara);
-		// System.out.println(ip.getEnderecoIPBinario());
-		// System.out.println(ip.getNetIDBinario());
-		// System.out.println(ip.getHostIDBinario());
-//		calculaNetID(ip, 12);
-		// System.out.println(ip.getNetID());
-		// System.out.println(ip.getNetIDBinario());
-		// calculaHostID(ip, 20);
-		// System.out.println(ip.getHostID());
-		// System.out.println(ip.getHostIDBinario());
-		// System.out.println(verificaEnderecoPrivado(ip));
-//		System.out.println(defineQtdEnderecos(ip, mascara));
-		// System.out.println(calculaQtdUmDireita(mascara));
-		defineEnderecoSubRedeDinamico(ip, mascara);
-		defineEnderecosHostPossiveis(ip, mascara);
+		// Segundo passo: validar se ip é válido
+		if (validaEnderecoIP(ipAux)) {
+			// Terceiro passo: Converter os endereços em binarios sem pontos
+			// e guardar uma única string
+			defineEnderecoIPBinarioSemPonto(ipAux);
+			defineEnderecoIPBinarioSemPonto(mascara);
+			// Quarto passo: Definir a classe do IP e a máscara padrão (se
+			// houver)
+			defineClasseIP(ipAux);
+			// Quinto passo: Verificar se o endereço IP é privado
+			if (verificaEnderecoPrivado(ipAux)) {
+				FacesMessage message = new FacesMessage("Atenção: O endereço é privado!");
+			}
+			defineNetIDDinamico(ipAux, mascara);
+			defineHostIDDinamico(ipAux, mascara);
+			defineEnderecoBroadcastDinamico(ipAux, mascara);
+			defineEnderecoSubRedeDinamico(ipAux, mascara);
+			ipAux.setQtdEnderecos(defineQtdEnderecos(ipAux, mascara));
+			return ipAux;
+		} else {
+			FacesMessage message = new FacesMessage("Por favor, digite um endereço válido");
+			return null;
+		}
+	}
+
+	/**
+	 * Método responsável por tratar um ip com máscara e retornar as informações
+	 * de de todas as subredes possiveis
+	 * 
+	 * @param ip
+	 * @return
+	 */
+	public static List<IP> tratarIPComMascaraESubRedes(IP ip, IP mascara) {
+		IP ipAux = new IP();
+		List<IP> listIPAux = new ArrayList<IP>();
+		ipAux = ip;
+		// Primeiro passo: Separar os blocos dos enderecos
+		separaBlocos(ipAux);
+		separaBlocos(mascara);
+		// Segundo passo: validar se ip é válido
+		if (validaEnderecoIP(ipAux)) {
+			// Terceiro passo: Converter os endereços em binarios sem pontos
+			// e guardar uma única string
+			defineEnderecoIPBinarioSemPonto(ipAux);
+			defineEnderecoIPBinarioSemPonto(mascara);
+			// Quarto passo: Definir a classe do IP e a máscara padrão (se
+			// houver)
+			defineClasseIP(ipAux);
+			// Quinto passo: Verificar se o endereço IP é privado
+			if (verificaEnderecoPrivado(ipAux)) {
+				FacesMessage message = new FacesMessage("Atenção: O endereço é privado!");
+			}
+			// Sexto passo: definir netID e hostID a partir da classe do
+			// endereço
+			defineNetIDDinamico(ipAux, mascara);
+			defineHostIDDinamico(ipAux, mascara);
+			defineEnderecoBroadcastDinamico(ipAux, mascara);
+			defineEnderecoSubRedeDinamico(ipAux, mascara);
+			ipAux.setQtdEnderecos(defineQtdEnderecos(ipAux, mascara));
+			listIPAux = defineEnderecosHostPossiveis(ipAux, mascara);
+			return listIPAux;
+		} else {
+			FacesMessage message = new FacesMessage("Por favor, digite um endereço válido");
+			return null;
+		}
+	}
+
+	// public static void main(String args[]) {
+	// IP ip = new IP("255.255.255.255");
+	// IP mascara = new IP("255.0.0.0");
+	// separaBlocos(ip);
+	// separaBlocos(mascara);
+	// imprimeBlocosInteirosEBinarios(ip);
+	// defineClasseIP(ip);
+	// defineEnderecoIPBinarioSemPonto(ip);
+	// defineEnderecoIPBinarioSemPonto(mascara);
+	// System.out.println(ip.getClasse());
+	// defineMascaraPadraoIP(ip);
+	// System.out.println(ip.getMascaraPadrao());
+	// defineNetIDSimples(ip);
+	// defineHostIDSimples(ip);
+	// System.out.println(ip.getNetID());
+	// System.out.println(ip.getHostID());
+	// boolean testePonto = validarSeparacaoPorPontoIP(ip);
+	// System.out.println(testePonto);
+	// boolean testeIntervalo = validarIntervaloBloco(ip);
+	// System.out.println(testeIntervalo);
+	// boolean testeGeral = validaEnderecoIP(ip);
+	// System.out.println(testeGeral);
+	// defineNetIDDinamico(ip, mascara);
+	// defineNetIDDinamico(ip, mascara);
+	// defineHostIDDinamico(ip, mascara);
+	// System.out.println(ip.getEnderecoIPBinario());
+	// System.out.println(ip.getNetIDBinario());
+	// System.out.println(ip.getHostIDBinario());
+	// calculaNetID(ip, 12);
+	// System.out.println(ip.getNetID());
+	// System.out.println(ip.getNetIDBinario());
+	// calculaHostID(ip, 20);
+	// System.out.println(ip.getHostID());
+	// System.out.println(ip.getHostIDBinario());
+	// System.out.println(verificaEnderecoPrivado(ip));
+	// System.out.println(defineQtdEnderecos(ip, mascara));
+	// System.out.println(calculaQtdUmDireita(mascara));
+	// defineEnderecoSubRedeDinamico(ip, mascara);
+	// defineEnderecosHostPossiveis(ip, mascara);
+	// }
+	/**
+	 * Método que realiza a validação de um endereço IP
+	 * 
+	 * @param ip
+	 * @return
+	 */
+	public static boolean validaEnderecoIP(IP ip) {
+		if (validarSeparacaoPorPontoIP(ip)) {
+			if (validarIntervaloBloco(ip)) {
+				return true;
+			} else {
+				return false;
+			}
+		} else {
+			return false;
+		}
 	}
 
 	/**
 	 * Método que valida se um endereço de ip está separado por pontos
+	 * 
 	 * @param ip
 	 * @return
 	 */
@@ -88,7 +236,7 @@ public class IPService {
 						contDigitos = 0;
 					}
 				} else {
-					if (contPontos > 3) {
+					if (contPontos != 3) {
 						return false;
 					}
 				}
@@ -102,6 +250,7 @@ public class IPService {
 
 	/**
 	 * Método que recebe uma máscara e um ip e calcula o NetID dinamicamente
+	 * 
 	 * @param ip
 	 * @param mascara
 	 */
@@ -114,6 +263,7 @@ public class IPService {
 
 	/**
 	 * Método que recebe uma máscara e um ip e calcula o HostID dinamicamente
+	 * 
 	 * @param ip
 	 * @param mascara
 	 */
@@ -125,7 +275,9 @@ public class IPService {
 	}
 
 	/**
-	 * Método que recebe uma máscara e um ip e calcula o Endereço de Broadcast dinamicamente
+	 * Método que recebe uma máscara e um ip e calcula o Endereço de Broadcast
+	 * dinamicamente
+	 * 
 	 * @param ip
 	 * @param mascara
 	 */
@@ -137,7 +289,9 @@ public class IPService {
 	}
 
 	/**
-	 * Método que recebe uma máscara e um ip e calcula o endereço de subrede dinamicamente
+	 * Método que recebe uma máscara e um ip e calcula o endereço de subrede
+	 * dinamicamente
+	 * 
 	 * @param ip
 	 * @param mascara
 	 */
@@ -149,8 +303,9 @@ public class IPService {
 	}
 
 	/**
-	 * Método que valida se um endereço de IP está devidamente entre os 
+	 * Método que valida se um endereço de IP está devidamente entre os
 	 * intervalos de bloco
+	 * 
 	 * @param ip
 	 */
 	public static boolean validarIntervaloBloco(IP ip) {
@@ -164,8 +319,11 @@ public class IPService {
 		}
 		return true;
 	}
+
 	/**
-	 * Método que calcula a quantidade de digitos um mais a direita em um endereço IP
+	 * Método que calcula a quantidade de digitos um mais a direita em um
+	 * endereço IP
+	 * 
 	 * @param ip
 	 * @return
 	 */
@@ -183,8 +341,11 @@ public class IPService {
 		}
 		return cont;
 	}
+
 	/**
-	 * Método que calcula o netid a partir de n, onde n é a quantidade de bits da máscara
+	 * Método que calcula o netid a partir de n, onde n é a quantidade de bits
+	 * da máscara
+	 * 
 	 * @param ip
 	 * @param n
 	 */
@@ -224,9 +385,11 @@ public class IPService {
 		}
 		ip.setNetID(auxDecimal);
 	}
-	
+
 	/**
-	 * Método que calcula o hostid a partir de n, onde n é a quantidade de bits da máscara
+	 * Método que calcula o hostid a partir de n, onde n é a quantidade de bits
+	 * da máscara
+	 * 
 	 * @param ip
 	 * @param n
 	 */
@@ -269,8 +432,9 @@ public class IPService {
 	}
 
 	/**
-	 * Método que calcula o endereço de broadcast a partir de n, 
-	 * onde n é a quantidade de bits da máscara
+	 * Método que calcula o endereço de broadcast a partir de n, onde n é a
+	 * quantidade de bits da máscara
+	 * 
 	 * @param ip
 	 * @param n
 	 */
@@ -292,7 +456,7 @@ public class IPService {
 		}
 
 		pedaco = ip.getEnderecoBroadcastBinario().substring(inicioPedaco, fimPedaco);
-		ip.setHostIDBinario(ip.getEnderecoBroadcastBinario().replace(pedaco, arrayUm));
+		ip.setEnderecoBroadcastBinario(ip.getEnderecoBroadcastBinario().replace(pedaco, arrayUm));
 
 		i = 1;
 		while (i < 5) {
@@ -313,8 +477,9 @@ public class IPService {
 	}
 
 	/**
-	 * Método que calcula o endereço de subrede a partir de n, 
-	 * onde n é a quantidade de bits da máscara
+	 * Método que calcula o endereço de subrede a partir de n, onde n é a
+	 * quantidade de bits da máscara
+	 * 
 	 * @param ip
 	 * @param n
 	 */
@@ -356,8 +521,9 @@ public class IPService {
 	}
 
 	/**
-	 * Método que recebe um ip e separa seu conteúdo em blocos de números decimais
-	 * e blocos de binários
+	 * Método que recebe um ip e separa seu conteúdo em blocos de números
+	 * decimais e blocos de binários
+	 * 
 	 * @param ip
 	 */
 	public static void separaBlocos(IP ip) {
@@ -388,8 +554,10 @@ public class IPService {
 		ip.setBlocosInteiros(listaBlocosInteiros);
 		ip.setBlocosBinarios(listaBlocosBinarios);
 	}
+
 	/**
 	 * Método que recebe um endereço IP e define sua classe
+	 * 
 	 * @param ip
 	 */
 	public static void defineClasseIP(IP ip) {
@@ -433,7 +601,8 @@ public class IPService {
 	// }
 	// }
 	/**
-	 *Método que verifica se um endereço IP é privado ou não
+	 * Método que verifica se um endereço IP é privado ou não
+	 * 
 	 * @param ip
 	 * @return
 	 */
@@ -450,15 +619,17 @@ public class IPService {
 			}
 		} else if (ip.getClasse() == 'C') {
 			if (ip.getBlocosInteiros().get(0).equals(new String("192"))
-					|| ip.getBlocosInteiros().get(1).equals(new String("168"))) {
+					&& ip.getBlocosInteiros().get(1).equals(new String("168"))) {
 				return true;
 			}
 		}
 
 		return false;
 	}
+
 	/**
 	 * Método que define o netid de forma estática
+	 * 
 	 * @param ip
 	 */
 	public static void defineNetIDSimples(IP ip) {
@@ -482,8 +653,10 @@ public class IPService {
 			break;
 		}
 	}
+
 	/**
 	 * Método que define o hostid de forma estática
+	 * 
 	 * @param ip
 	 */
 	public static void defineHostIDSimples(IP ip) {
@@ -507,8 +680,10 @@ public class IPService {
 			break;
 		}
 	}
+
 	/**
 	 * Método que imprime os blocos inteiros e binários de um endereço
+	 * 
 	 * @param ip
 	 */
 	public static void imprimeBlocosInteirosEBinarios(IP ip) {
@@ -519,8 +694,10 @@ public class IPService {
 			System.out.println("Posicao " + i + ":" + ip.getBlocosBinarios().get(i));
 		}
 	}
+
 	/**
 	 * Método que calcula um endereço binário sem a separação por pontos
+	 * 
 	 * @param ip
 	 */
 	public static void defineEnderecoIPBinarioSemPonto(IP ip) {
@@ -553,8 +730,9 @@ public class IPService {
 	}
 
 	/**
-	 * Método que retorna a quantidade de endereços em um bloco,
-	 * a partir do ip e da máscara
+	 * Método que retorna a quantidade de endereços em um bloco, a partir do ip
+	 * e da máscara
+	 * 
 	 * @param ip
 	 * @param mascara
 	 * @return
@@ -567,8 +745,9 @@ public class IPService {
 	}
 
 	/**
-	 * Método que define e retorna todos os endereços de host possíveis
-	 * em uma subrede
+	 * Método que define e retorna todos os endereços de host possíveis em uma
+	 * subrede
+	 * 
 	 * @param ip
 	 * @param mascara
 	 * @return
@@ -667,7 +846,7 @@ public class IPService {
 		} else if (n > 16 && n <= 24) {
 			IP newIPAux = new IP();
 			newIPAux = subRedes.get(0);
-			qtdSubRedes = 255 - (Integer.parseInt(newIPAux.getBlocosInteiros().get(1))) + (2*255);
+			qtdSubRedes = 255 - (Integer.parseInt(newIPAux.getBlocosInteiros().get(1))) + (2 * 255);
 			for (int i = 0; i < qtdSubRedes; i++) {
 				int intAux = 0;
 				int intAux2 = 0;
